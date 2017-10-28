@@ -1,6 +1,6 @@
 module Update exposing (..)
 
-import Models exposing (Model, Mode(..), Drag)
+import Models exposing (Model, Mode(..), Drag, Line)
 import Messages exposing (..)
 import Dict exposing (Dict(..))
 import Mouse exposing (Position)
@@ -10,7 +10,7 @@ import Mouse exposing (Position)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ points, mode, drag, nextId } as model) =
+update msg ({ points, mode, drag, nextId, lines, to } as model) =
     let
         flipMode mode =
             case mode of
@@ -34,7 +34,33 @@ update msg ({ points, mode, drag, nextId } as model) =
                 ( { model | drag = (Maybe.map (\{ start, id } -> Drag start xy id) drag) }, Cmd.none )
 
             DragEnd _ ->
-                ( { model | drag = Nothing, points = getPoints model }, Cmd.none )
+                case ( mode, drag, to ) of
+                    ( New, _, _ ) ->
+                        ( { model | drag = Nothing, points = getPoints model }, Cmd.none )
+
+                    ( Connect, Just { id }, Just to ) ->
+                        ( { model | drag = Nothing, to = Nothing, lines = Line id to :: lines }
+                        , Cmd.none
+                        )
+
+                    ( Connect, _, _ ) ->
+                        ( { model | drag = Nothing, to = Nothing }, Cmd.none )
+
+            ConnectOn id ->
+                case drag of
+                    Just _ ->
+                        ( { model | to = Just id }, Cmd.none )
+
+                    Nothing ->
+                        ( model, Cmd.none )
+
+            ConnectOff ->
+                case drag of
+                    Just _ ->
+                        ( { model | to = Nothing }, Cmd.none )
+
+                    Nothing ->
+                        ( model, Cmd.none )
 
 
 canvasClick_ : Model -> Position -> ( Model, Cmd Msg )

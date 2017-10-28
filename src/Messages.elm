@@ -1,7 +1,7 @@
 module Messages exposing (..)
 
 import Mouse exposing (Position)
-import Models
+import Models exposing (Id, Mode)
 
 
 -- Message
@@ -10,6 +10,8 @@ import Models
 type Msg
     = Flip
     | CanvasClick Mouse.Position
-    | DragStart Position Models.Id
+    | DragStart Position Id
     | DragAt Position
     | DragEnd Position
+    | ConnectOn Id
+    | ConnectOff

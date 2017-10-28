@@ -20,6 +20,10 @@ type alias Drag =
     }
 
 
+type alias Line =
+    { from : Id, to : Id }
+
+
 
 -- Model
 
@@ -28,14 +32,18 @@ type alias Model =
     { points : Dict Id Position
     , mode : Mode
     , drag : Maybe Drag
+    , to : Maybe Id
     , nextId : Id
+    , lines : List Line
     }
 
 
 initialModel : Model
 initialModel =
     { points = Dict.empty
+    , lines = []
     , mode = New
+    , to = Nothing
     , drag = Nothing
     , nextId = 1
     }
